@@ -97,7 +97,7 @@ class Contest(models.Model, ContestType):
         (CODEFORCES, 'Codeforces'),
         (INFORMATICS, 'Informatics'),
         (EJUDGE_CACHED, 'Ejudge cache'),
-        (PCMS, 'PCMS')
+        (PCMS, 'PCMS'),
         (ALGOCODE, 'Algocode'),
     )
 
