@@ -8,7 +8,6 @@ def get_standings_data(standings: Standings):
     if len(group_list) == 0:
         group_list = standings.course.groups.all()
 
-    users_data = []
     users = []
     for group in group_list:
         users.extend(group.participants.all())
@@ -36,6 +35,7 @@ def get_standings_data(standings: Standings):
 
         contests.append(contest)
 
+    users_data = []
     for group in group_list:
         for user in group.participants.all():
             if user.id in user_ids:

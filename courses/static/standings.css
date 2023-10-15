@@ -40,6 +40,11 @@ td {
     border-left: none;
 }
 
+td.showtime {
+    height: 2em;
+    line-height: 0.9rem;
+}
+
 td.name {
     text-align: left;
 }

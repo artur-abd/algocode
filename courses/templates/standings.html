@@ -13,7 +13,9 @@
         var contest_id = {{ contest_id }};
         var is_olymp = {% if standings.contest_type == standings.OLYMP %}true{% else %}false{% endif %};
         var is_blitz = {% if standings.contest_type == standings.BLITZ %}true{% else %}false{% endif %};
+        var is_acm_olymp = {% if standings.contest_type == standings.ACM_OLYMP %}true{% else %}false{% endif %};
         var enable_marks = {% if standings.enable_marks %}true{% else %}false{% endif %};
+        var disable_contest_marks = {% if standings.disable_contest_marks %}true{% else %}false{% endif %};
     </script>
     <script src="{% static 'standings.js' %}"></script>
     {% autoescape off %}

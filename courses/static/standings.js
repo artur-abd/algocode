@@ -25,6 +25,13 @@ document.addEventListener('DOMContentLoaded', function () {
 var addCell = function(row, text, klass, rowSpan, colSpan) {
     let cell = row.insertCell();
     cell.innerHTML = text;
+    if (is_acm_olymp) {
+        if (klass == '') {
+            klass = 'showtime';
+        } else {
+            klass += ' showtime';
+        }
+    }
     cell.className = klass || '';
     cell.rowSpan = rowSpan || 1;
     cell.colSpan = colSpan || 1;
@@ -50,7 +57,7 @@ var compareUsers = function(a, b) {
     return a['name'].localeCompare(b['name']);
 };
 
-var getMarkColor = function(mark) {
+var getDefaultMarkColor = function(mark) {
     if (mark >= 7.5) {
         return 'lightgreen';
     } else if (mark >= 5.5) {
@@ -60,6 +67,22 @@ var getMarkColor = function(mark) {
     } else {
         return 'lightcoral';
     }
+}
+
+var getSchoolMarkColor = function(mark) {
+    if (mark >= 4.5) {
+        return 'lightgreen';
+    } else if (mark >= 3.5) {
+        return 'greenyellow';
+    } else if (mark >= 2.5) {
+        return 'yellow';
+    } else {
+        return 'lightcoral';
+    }
+};
+
+var getMarkColor = function(mark) {
+    return getDefaultMarkColor(mark);
 };
 
 var defaultContestMark = function(total_score, problem_score) {
@@ -103,7 +126,7 @@ var relativeContestMark = function(
     }
 };
 
-var useOldContestMark = function(total_scores, user_id) {
+var extractUserData = function(total_scores, user_id) {
     let total_score = 0;
     let problem_score = new Array(total_scores[0].length).fill(0);
     let problem_max_score = new Array(total_scores[0].length).fill(0);
@@ -130,6 +153,24 @@ var useOldContestMark = function(total_scores, user_id) {
         }
     }
 
+    return {
+        total_score,
+        problem_score,
+        problem_max_score,
+        total_users,
+        problem_accepted,
+        max_score
+    };
+};
+
+var useOldContestMark = function(total_scores, user_id) {
+    let {total_score,
+        problem_score,
+        problem_max_score,
+        total_users,
+        problem_accepted,
+        max_score} = extractUserData(total_scores, user_id)
+
     return calculateContestMark(
         total_score,
         problem_score,
@@ -138,6 +179,27 @@ var useOldContestMark = function(total_scores, user_id) {
         problem_accepted,
         max_score,
     )
+};
+
+var useSchoolContestMark = function(total_scores, user_id) {
+    return Math.max(2, Math.round(useOldContestMark(total_scores, user_id) / 2.0))
+};
+
+var useExamContestMark = function(total_scores, user_id) {
+    let {total_score,
+        problem_score,
+        problem_max_score,
+        total_users,
+        problem_accepted,
+        max_score} = extractUserData(total_scores, user_id)
+    if (total_score >= 300) {
+        return 5.0;
+    } else if (total_score >= 200) {
+        return 4.0;
+    } else if (total_score >= 100) {
+        return 3.0;
+    }
+    return 2.0;
 };
 
 var defaultTotalMark = function(marks, coefficients) {
@@ -311,8 +373,10 @@ var calculateInformation = function(users, contests) {
         contests.forEach(function(contest) {
             contest['users'][id].forEach(function(result) {
                 user['score'] += result['score'];
-                if (result['score'] !== 0) {
+                if (result['score'] !== 0 && !is_acm_olymp) {
                     user['penalty'] += result['penalty'];
+                } else if (is_acm_olymp) {
+                    user['penalty'] += Math.floor(result['time'] / 60);
                 }
             });
         });
@@ -379,6 +443,11 @@ var addProblemCell = function(row, problem) {
                     text = add_inf(text);
                 }
             }
+            if (is_acm_olymp) {
+                let minutes = Math.floor(problem['time'] / 60);
+                let seconds = problem['time'] % 60;
+                text += '<div style="font-size: xx-small;">' + minutes + ':' + seconds + '</div>';
+            }
             let cell = addCell(row, text, 'ok');
             if (penalty > 9) {
                 cell.title = '+' + penalty;
@@ -403,7 +472,7 @@ var addProblemCell = function(row, problem) {
             cell.title = "Нарушены правила оформления"
         } else if (problem['verdict'] === 'DQ') {
             let cell = addCell(row, 'ᕁ_ᕁ', 'gray');
-            cell.title = 'Дисквалифицированно';
+            cell.title = 'Дисквалифицировано';
             cell.style.backgroundColor = "#808080";
         } else {
             if (penalty === 0) {
@@ -456,16 +525,18 @@ var addHeader = function(holder, contests) {
         } else {
             title = title_text;
         }
-        addCell(header_row1, title, 'gray contest_title', 1, problems.length + 1);
+        let extra_len = 1;
+        if (enable_marks && !disable_contest_marks) {
+            extra_len += 1;
+        }
+        addCell(header_row1, title, 'gray contest_title', 1, problems.length + extra_len);
         problems.forEach(function(problem) {
             let cell = addCell(header_row2, problem['short'], 'problem_letter gray');
             cell.title = problem['long'];
         });
-        if (enable_marks && !is_olymp) {
+        let cell = addCell(header_row2, 'Σ', 'problem_letter gray');
+        if (enable_marks && !disable_contest_marks) {
             addCell(header_row2, 'Mark', 'problem_letter gray');
-        }
-        else {
-            let cell = addCell(header_row2, 'Σ', 'problem_letter gray');
         }
     });
 };
@@ -538,22 +609,25 @@ var addBody = function(body, users, contests) {
             problems.forEach(function (problem) {
                 addProblemCell(row, problem);
             });
-            if (!is_olymp && enable_marks) {
-                let cell = addCell(row, user['marks'][idx].toFixed(2));
+
+            let text = user['scores'][idx];
+            if (user['scores'][idx] === 0) {
+                text = ""
+            }
+            let cell = addCell(row, text, 'gray');
+            if (is_olymp && user['scores'][idx] > 0) {
+                cell.style.backgroundColor = getScoreColor(user['scores'][idx] / problems.length);
+            }
+            else if (enable_marks && !disable_contest_marks && user['scores'][idx] > 0) {
                 cell.style.backgroundColor = getMarkColor(user['marks'][idx]);
             }
-            else {
-                let text = user['scores'][idx];
-                if (user['scores'][idx] === 0) {
-                    text = ""
-                }
-                let cell = addCell(row, text, 'gray');
-                if (is_olymp && user['scores'][idx] > 0) {
-                    cell.style.backgroundColor = getScoreColor(user['scores'][idx] / problems.length);
-                }
-                else if (!is_olymp && user['scores'][idx] > 0) {
-                    cell.style.backgroundColor = getMarkColor(10 * user['scores'][idx] / problems.length);
-                }
+            else if (user['scores'][idx] > 0) {
+                cell.style.backgroundColor = getMarkColor(10 * user['scores'][idx] / problems.length);
+            }
+
+            if (enable_marks && !disable_contest_marks) {
+                let cell = addCell(row, user['marks'][idx].toFixed(2));
+                cell.style.backgroundColor = getMarkColor(user['marks'][idx]);
             }
         });
     }

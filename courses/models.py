@@ -32,12 +32,14 @@ def get_photo_path(instance, filename):
 
 class ContestType:
     ACM = "AC"
+    ACM_OLYMP = "AO"
     OLYMP = "OL"
     BATTLESHIP = "BS"
     BLITZ = "BT"
 
     TYPES = (
         (ACM, "Acm"),
+        (ACM_OLYMP, "Acm competition"),
         (OLYMP, "Olympiad"),
         (BATTLESHIP, "Battleship"),
         (BLITZ, "Blitz"),
@@ -62,6 +64,7 @@ class Course(models.Model):
     template = models.TextField(default='course.html')
     ejudge_url = models.TextField(blank=True)
     codeforces_url = models.TextField(default="https://codeforces.com")
+    algocode_url = models.TextField(blank=True)
     contests_text = models.TextField(default="Занятия")
     pcms_url = models.TextField(blank=True)
 
@@ -85,6 +88,7 @@ class Contest(models.Model, ContestType):
     INFORMATICS = 'IN'
     EJUDGE_CACHED = 'EC'
     PCMS = 'PC'
+    ALGOCODE = 'AG'
 
     DEFAULT_RELOAD_TIME = datetime.fromtimestamp(0)
 
@@ -94,6 +98,7 @@ class Contest(models.Model, ContestType):
         (INFORMATICS, 'Informatics'),
         (EJUDGE_CACHED, 'Ejudge cache'),
         (PCMS, 'PCMS')
+        (ALGOCODE, 'Algocode'),
     )
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='contests')
@@ -231,6 +236,7 @@ class Standings(models.Model, ContestType):
     olymp = models.BooleanField(default=False)
     contest_type = models.CharField(max_length=2, choices=ContestType.TYPES, default=ContestType.ACM)
     enable_marks = models.BooleanField(default=False)
+    disable_contest_marks = models.BooleanField(default=False)
     js_for_contest_mark = models.TextField(blank=True,
                                            default="var newCalculateContestMark = function(\n    total_scores,       // двумерный массив пар балла и времени сдачи задач пользователями\n    user_id,            // номер пользователя\n    contest_info        // информация о контесте\n) {\n    return useOldContestMark(total_scores, user_id)\n};")
     js_for_total_mark = models.TextField(blank=True,
@@ -280,7 +286,7 @@ def calc_marks_v1(
     contest_info, # contest info from algocode admin
 ):
     return [0] * len(user_scores)
-    
+
 marks = calc_marks_v1(user_scores, contest_info)
 ''')
 

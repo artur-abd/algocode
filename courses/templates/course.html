@@ -30,6 +30,19 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
+        {% if standings %}
+            <h3>Таблицы результатов</h3>
+            {% for standing in standings %}
+                {% if link.file %}
+                    <a href="{{ link.file.url }}" {% if link.new_tab %}target="_blank"{% endif %}>{{ link.text }}</a><br>
+                {% elif link.link %}
+                    <a href="{{ link.link }}" {% if link.new_tab %}target="_blank"{% endif %}>{{ link.text }}</a><br>
+                {% else %}
+                    {{ link.text }}<br>
+                {% endif %}
+                <a href="/standings/{{standing.label}}" target="_blank">{{standing.title }}</a><br>
+            {% endfor %}
+        {% endif %}
         {% if teachers %}
             <h3>Преподаватели</h3>
             {% for teacher in teachers %}
@@ -91,7 +104,7 @@
                         {% if contest.contest.other_link %}
                             <a href="{{ contest.contest.other_link }}">Вход</a>
                         {% elif contest.contest.judge == 'EJ' or contest.contest.judge == 'EC' %}
-                            <a href="{{ ejudge_url }}{{ contest.contest.contest_id }}">Вход</a>
+                            <a href="{{ ejudge_url }}/new-client?contest_id={{ contest.contest.contest_id }}">Вход</a>
                         {% elif contest.contest.judge == 'CF' %}
                             <a href="{{ course.codeforces_url }}/group/{{ contest.contest.external_group_id }}/contest/{{ contest.contest.contest_id }}">Вход</a>
                         {% elif contest.contest.judge == 'IN' %}

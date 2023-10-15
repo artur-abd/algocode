@@ -61,11 +61,14 @@ class CourseView(View):
         links = course.links.filter(hidden=False).order_by("priority")
         contests = []
 
+        standings = Standings.objects.filter(course = course)
+
         for contest in contests_list:
             contests.append({
                 'contest': contest,
                 'links': contest.links.order_by('id').order_by("priority"),
             })
+
 
         return render(
             request,
@@ -75,7 +78,8 @@ class CourseView(View):
                 'contests': contests,
                 'links': links,
                 'ejudge_url': course.ejudge_url,
-                'teachers': course.teachers.order_by("priority")
+                'teachers': course.teachers.order_by("priority"),
+                'standings': standings,
             }
         )
 
@@ -139,6 +143,7 @@ class RestartEjudge(View):
             return HttpResponseBadRequest("Not admin")
         else:
             os.system(EJUDGE_CONTROL.format('stop'))
+
             sleep(15)
             os.system(EJUDGE_CONTROL.format('start'))
             return HttpResponse("Restarted ejudge")
