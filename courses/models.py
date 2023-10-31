@@ -103,6 +103,7 @@ class Contest(models.Model, ContestType):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='contests')
     date = models.DateField()
+    deadline = models.DateField(blank=True, null=True)
     title = models.TextField()
     statements = models.FileField(upload_to=get_statements_file_path, blank=True)
     show_statements = models.BooleanField(default=False)

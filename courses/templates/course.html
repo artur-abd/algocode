@@ -69,7 +69,7 @@
         {% for contest in contests %}
             <div class="lesson" id="lesson_{{ contest.contest.id }}">
                 <div class="lesson_date">
-                    {{ contest.contest.date }}
+                    {{ contest.contest.date }} {% if contest.contest.deadline %} &mdash; {{ contest.contest.deadline }}{% endif %}
                 </div>
                 <div class="lesson_topic">
                     {{ contest.contest.title }}
