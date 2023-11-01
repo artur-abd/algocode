@@ -49,6 +49,9 @@ def process_contest(runs_list, problems, contest, users, **kwargs):
             utc_time = run['utc_time']
             if contest.duration != 0 and time > contest.duration * 60:
                 continue
+            utc_date = datetime.date.fromtimestamp(utc_time)
+            if contest.deadline is not None and utc_date > contest.deadline:
+                continue
 
             prob_id = run['prob_id']
             score = run['score']
@@ -102,7 +105,7 @@ def process_contest(runs_list, problems, contest, users, **kwargs):
                     user_info[user.id][i]['bid'] = 0
                     try:
                         problem = BlitzProblem.objects.get(problem_id=problem['short'], contest=contest)
-                        start = BlitzProblemStart.objects.get(participant_id=user.ejudge_id, problem=problem)
+                        start = BlitzProblemStart.objects.get(participant_id=user.id, problem=problem)
                         user_info[user.id][i]['initial_bid'] = start.bid
                         if user_info[user.id][i]['verdict'] == EJUDGE_OK:
                             user_info[user.id][i]['bid'] = start.bid
