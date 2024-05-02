@@ -19,7 +19,11 @@ def get_standings_data(standings: Standings):
     contests_models = contests_models.order_by('-date', '-id')
     contests = []
     for contest_model in contests_models:
-        contest = load_contest(contest_model, users)
+        contest = load_contest(
+                contest_model,
+                users,
+                ups_mode=standings.enable_upsolving,
+        )
         if contest is None:
             continue
 
