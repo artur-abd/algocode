@@ -77,7 +77,6 @@ LOGGING = {
     },
 }
 
-
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -154,3 +153,15 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://ejudge.kpfu.ru',
+    'https://ejudge.kpfu.ru',
+]
+# ALLOWED_HOSTS = [
+#     'localhost',
+# ],
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:8000',
+# ]
+
