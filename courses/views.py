@@ -69,11 +69,11 @@ class CourseView(View):
                 'links': contest.links.order_by('id').order_by("priority"),
             })
 
-
         return render(
             request,
             course.template,
             {
+                'user': request.user,
                 'course': course,
                 'contests': contests,
                 'links': links,
