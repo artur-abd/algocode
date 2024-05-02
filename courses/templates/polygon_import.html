@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polygon to Ejudge importer</title>
+</head>
+<body>
+<form method="post" action="{% url 'import_contest' %}">
+    {% csrf_token %}
+    <p>ID контеста в ejudge</p>
+    <input type="number" name="polygon_id">
+    <p>ID контеста в polygon</p>
+    <input type="number" name="ejudge_id">
+    <input type="submit" value="Import">
+</form>
+
+</body>
+</html>
