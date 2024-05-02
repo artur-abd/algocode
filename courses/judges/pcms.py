@@ -59,7 +59,7 @@ def load_pcms_contest(c, users):
                         })
                 else:
                     if "score" in problem:
-                        score = problem["score"]
+                        score = int(problem["score"])
                     else:
                         score = 1
                     runs_list.append({

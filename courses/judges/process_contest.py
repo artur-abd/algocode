@@ -37,6 +37,8 @@ def process_contest(runs_list, problems, contest, users, **kwargs):
                 if save_utc:
                     user_info[user.id][-1]["utc_time"] = 0
 
+    ups_mode = 'ups_mode' in kwargs and kwargs['ups_mode']
+
     for run in runs_list:
         try:
             user_id = run['user_id']
@@ -47,11 +49,13 @@ def process_contest(runs_list, problems, contest, users, **kwargs):
             status = run['status']
             time = run['time']
             utc_time = run['utc_time']
-            if contest.duration != 0 and time > contest.duration * 60:
-                continue
-            utc_date = datetime.date.fromtimestamp(utc_time)
-            if contest.deadline is not None and utc_date > contest.deadline:
-                continue
+
+            if not ups_mode:
+                if contest.duration != 0 and time > contest.duration * 60:
+                    continue
+                utc_date = datetime.date.fromtimestamp(utc_time)
+                if contest.deadline is not None and utc_date > contest.deadline:
+                    continue
 
             prob_id = run['prob_id']
             score = run['score']

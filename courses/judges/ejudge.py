@@ -18,7 +18,7 @@ def localize_time(time_str):
 def load_ejudge_contest(contest, users):
     ejudge_id = '{:06d}'.format(contest.contest_id)
     try:
-        data = untangle.parse(os.path.join(JUDGES_DIR, ejudge_id, 'var/status/dir/external.xml'))
+        data = untangle.parse(os.path.join('/var/lib/ejudge/status', ejudge_id, 'dir/external.xml'))
     except:
         return None
 
@@ -70,8 +70,6 @@ def load_ejudge_contest(contest, users):
                 contest_users_start[ejudge_id] = time
                 continue
             time -= contest_users_start[ejudge_id]
-            if contest.duration != 0 and time > contest.duration * 60:
-                continue
 
             user_id = ejudge_ids[ejudge_id]
 
