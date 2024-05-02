@@ -375,8 +375,8 @@ var calculateInformation = function(users, contests) {
                 user['score'] += result['score'];
                 if (result['score'] !== 0 && !is_acm_olymp) {
                     user['penalty'] += result['penalty'];
-                } else if (is_acm_olymp) {
-                    user['penalty'] += Math.floor(result['time'] / 60);
+                } else if (result['score'] !== 0) {
+                    user['penalty'] += Math.floor(result['time'] / 60) + result['penalty'] * 20;
                 }
             });
         });
