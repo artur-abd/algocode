@@ -122,6 +122,14 @@ class Contest(models.Model, ContestType):
     def __str__(self):
         return '[{}] {}'.format(self.course.label, self.title)
 
+class Report(models.Model):
+    label = models.CharField(max_length=100)
+    archive = models.FileField(upload_to='reports/')
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='reports')
+
+    def __str__(self):
+        return self.label
+
 
 class ContestStandingsHolder(models.Model):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='standings_holder')

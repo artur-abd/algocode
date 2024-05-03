@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report create for contest {{ contest.id }} {{ contest.name }}</title>
+</head>
+<body>
+
+<div class="reports">
+    {% if reports %}
+        <h3>Reports</h3>
+        {% for report in reports %}
+            <br><a href={{ report.url }}>{{ report.label }}</a>
+                <br><i>{{ report.description }}</i>
+            </div>>
+        {% endfor %}
+    {% endif %}
+    <form method="post" action="{% url '' %}">
+        {% csrf_token %}
+        <input type="submit" value="Перезапустить ejudge">
+    </form>
+    <form method="post" action="{% url 'create_valuer' %}">
+        {% csrf_token %}
+        <p>id контеста</p>
+        <input type="number" name="contest_id">
+        <input type="submit" value="создать valuer">
+    </form>
+
+</body>
+</html>

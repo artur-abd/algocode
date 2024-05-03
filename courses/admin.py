@@ -53,6 +53,11 @@ class CourseLinkInline(admin.TabularInline):
     show_change_link = True
 
 
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['label', 'archive', 'contest']
+
 class MainLinkInline(admin.TabularInline):
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows': 1, 'cols': 40})},
